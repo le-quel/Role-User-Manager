@@ -122,5 +122,147 @@ II. Tạo file home.ejs trong view để render dữ liệu ra view thông qua 3
  router(/user) = > controller => view
 
 
+                        BÀI 3: CÁCH SỬ DỤNG BOOTSTRAP
+-  Nhúng link cdn: cách lấy : search bootstrap cdn nhúng cả cái link và thẻ script của nó vào đầu trang html
+-  một mẹo để sau này sử dụng các thư biện tương tự bootstrap là muốn lấy link để nhúng thì cứ gõ keywork "cdn" vào phía sau thư viện là nó sẽ ra link cho mình
 
 
+                        BÀI 4: CREATE NEWW USER 
+1 Cài đặt package mysql "npm install --save-exact mysql2@2.3.3"
+2 tạo file connectDB bằng mẫu code connect ở web "mysql2 npm"
+3 Cài đặt package bcrypt.js   để hash password  "npm install --save-exact bcryptjs@2.4.3"  
+
+4 Tạo form đăng ký 
+5 code luồng chạy ở file routers
+    5.1 tạo một function handlecreatenewuser sau đó ấn submit để check luồng đã nhận hay chưa
+6 import bodyparser vào file server.js (giúp chuyển đổi dạng dữ liệu từ data request nguyên thủy về thành data dạng json)
+        import bodyParser from "body-parser";
+
+        require("dotenv").config();
+        const app = express();
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({ extended: true }));
+7 function handle thêm console.log(">>> check request", req.body)
+=> lúc này check request thì ở terminal req trả về là một obj rỗng 
+=> muốn obj này có data thì phải thêm thuộc tính name ở dưới mỗi input để khi ấn nút submit thì form sẽ nhận data và truyền vào cái 
+mảng json này. 
+8 sau khi nhập data và ấn submit thì hàm check req log ra 
+>>> check request { email: 'lequelcm@gmail.com', password: '2222', username: 'adac' } là ok. 
+9 copy code connect ở mysql2 npm paste vô homecontroller và đặt tên host + tên db.
+
+                    BÀI 5: KẾT NỐI DB VÀ THÊM USER
+
+1. ở homecontroller thêm hàm connectdb
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "jwt_react"
+});
+=> phải cài đặt package mysql "npm install --save-exact mysql"
+
+2. ở function handlecreatenewuser thì bỏ câu quyery insert theo kiểu mysql2 vào (search mysql2 insert)
+
+const HandleCreateNewUser = (req, res) => {
+    let email = req.body.email
+    let password = req.body.password
+    let username = req.body.username
+
+    // query 
+   con.connect(function (err) {
+        if (err) throw err;
+        console.log("Connected!");
+        var sql = "INSERT INTO user (email, password, username) VALUES (?, ?, ?)";
+        con.query(sql, [email, password, username], function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+    });
+    console.log(">>> check request", req.body);
+    return res.send("hello neww user");
+}
+3. Nhập data vào ấn submit và dữ liệu load lên terminal  và check db nếu load đúng là ok 
+
+                            BÀI 6: HASH PASSWORD VỚI BCRYPTS
+            
+1. ở file homecontroller gõ 
+        // hash password vs bcrypts
+        import bcrypts from "bcryptjs";
+
+        const salt = bcrypts.genSaltSync(10);
+
+        let hash = bcrypts.hashSync("B4c0/\/", salt)
+2. trong function createnewuser gõ 
+  let hashPassword = bcrypts.hashSync("B4c0/\/", salt) // hash password
+    console.log(">>>Check hashpasword:", hashPassword); là hash thành công
+
+    tạo biến băm ngược 
+    let check = bcrypts.compareSync(password, hashPassword);
+    console.log(">>> check password: ", true);
+3. tạo file userSevices.js
+var mysql = require('mysql');
+import bcrypt from "bcryptjs";
+
+const salt = bcrypt.genSaltSync(10);
+
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "jwt_react"
+});
+
+const hashUserPassword = (userPassword) => {
+    let hashPassword = bcrypt.hashSync(userPassword, salt);
+    return hashPassword;
+}
+
+const CreateNewUser = (email, password, username, res) => {
+    let hashPass = hashUserPassword(password);
+    console.log(">>> Check hashpassword:", hashPass);
+
+    let check = bcrypt.compareSync(password, hashPass); // băm ngược
+    console.log(">>> Check password:", check);
+
+    con.connect(function (err) {
+        if (err) throw err;
+        console.log("Connected!");
+        var sql = "INSERT INTO user (email, password, username) VALUES (?, ?, ?)";
+        con.query(sql, [email, hashPass, username], function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+    });
+
+    // Do not use return res.send outside of a route handler
+    // You should handle the response within the route handler where CreateNewUser is called
+}
+
+module.exports = {
+    CreateNewUser
+};
+
+4. load user ra table
+4.1 Viết function loaduser ở file services
+    const getallUser = () => {
+    let user = []
+    con.connect(function (err) {
+        if (err) throw err;
+        console.log("Connected!");
+        var sql = "Select * from user ";
+        con.query(sql, function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+    });
+
+}
+4.2 Nối nó vào controller 
+        const Handle_getallUser = (req, res) => {
+            userServices.getallUser();
+            return res.send("gọi tăt cả user")
+        }
+4.3 Khai báo 1 cái router đường dẫn cho nó ở file web.js
+        router.get("/getall-user", homeController.Handle_getallUser)
