@@ -1,11 +1,15 @@
-            BÀI 1: SET UP
+                    
+                     BÀI 1: SET UP
+
+
 I. Cài Đặt Môi Trường 
     - node -v
     - npm init (cấu hình file json)
-    * cài đặt express, dotenv, bodyparser, ejs
+    * cài đặt express, dotenv, bodyparser, ejs (để biên dịch code html render ra view)
     - npm install --save-exact express@4.17.2 dotenv@10.0.0 body-parser@1.19.1 ejs@3.1.6
-    cài đặt babel và nodemon để reload server
+    cài đặt babel để biên dịch code giữa các version js khác nhau và nodemon để reload server
     - npm install --save-exact @babel/core@7.15.4 @babel/node@7.15.4 @babel/preset-env@7.15.4 nodemon@2.0.15
+(Một lưu ý nhỏ cần thử khi install một project mới thì có thể linh động các phiên bản phía sau dấu @ chắc chắn là gặp lỗi nhưng mà hiện tại tui chưa biết nó sẽ gặp lỗi gì  )
 II. set up thư thư mục chứa code gồm
     Src{
         configs
@@ -97,3 +101,26 @@ VIII. Chuyển đổi từ port set cứng thành port linh động bằng proce
 
 => Những lỗi gặp phải trong quá trình set up 
   có mỗi 1 lỗi do câu import express dư dấu {} nó tự import xong nó tự báo lỗi luôn ảo ệ
+
+                            BÀI 2: DESIGN PARTERN MVC
+
+I. Tạo file homeController trong controller sau đó chuyển hàm hendlehelloworld về homecontroller để điều hướng
+sau đó import homecontroller vào file web.js và chỗ return đổi đường dẫn và đi vào lớp homecontroller.handlehelloworld là xong
+import homeController from "../controllers/homeController";
+ router.get("/", homeController.HandleHelloWorld)
+
+II. Tạo file home.ejs trong view để render dữ liệu ra view thông qua 3 luồng 
+ - luồng 1 là dữ liệu có sẳn trong file home
+ - luồng 2 là function nằm trong file homecontroller 
+ const HandleHelloWorld = (req, res) => {
+    return res.render("home.ejs");
+}
+- luồng 3 là đường dẫn mặc định có sẳn sẽ thay đổi mỗi cái tên file cần render mà thôi đã được config sẳn ở file viewengine
+ app.set("views", "./src/views"); 
+
+ * quy tắc render
+ router(/user) = > controller => view
+
+
+
+
