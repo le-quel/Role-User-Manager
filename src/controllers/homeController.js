@@ -1,18 +1,21 @@
 import userServices from '../services/userServices'
 
+var mysql2 = require('mysql2/promise');
 
-var mysql = require('mysql');
+import bluebird from "bluebird";
+// var mysql2 = require('mysql2');
 // hash password vs bcrypts
 import bcrypts from "bcryptjs";
 
 const salt = bcrypts.genSaltSync(10);
 
 
-var con = mysql.createConnection({
+var conection = mysql2.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "jwt_react"
+    database: "jwt_react",
+    promise: bluebird,
 });
 
 const HandleHelloWorld = (req, res) => {
@@ -37,9 +40,15 @@ const HandleCreateNewUser = (req, res) => {
     return res.send("handlecreatenewuser");
 }
 
-const Handle_getallUser = (req, res) => {
-    userServices.getallUser();
-    return res.send("gọi tăt cả user")
+const Handle_getallUser = async (req, res) => {
+    try {
+        let userList = await userServices.getallUser();
+        // console.log(">>>check list user:", userList);
+        return res.render("listUser.ejs", { userList });  // {userList} là trả nó ra theo dạng obj
+    } catch (error) {
+        console.error("Error in Handle_getallUser:", error);
+        return res.status(500).send("Internal Server Error");
+    }
 }
 
 module.exports = {

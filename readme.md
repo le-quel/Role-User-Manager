@@ -266,3 +266,39 @@ module.exports = {
         }
 4.3 Khai báo 1 cái router đường dẫn cho nó ở file web.js
         router.get("/getall-user", homeController.Handle_getallUser)
+
+                    BÀI 7: RENDER USER RA VIEW 
+
+1. cài đặt package blubird để xử lý bất đồng bộ promise"npm install --save-exact bluebird@3.7.2"
+2. file serviecs import mysql promise "var mysql = require('mysql/promise');"
+var conection = await mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "jwt_react",
+    promise: blubird,
+});
+ở function getall user thì trả ra userlist bằng obj {userlist} để ejs hiểu
+ở file listuser.ejs thì search gg list data with ejs để bê được cách xuất mảng bằng các cột 
+
+ <% userList.forEach(function(item,index){ %>
+                <tr>
+                    <th scope="row">
+                        <%= index + 1 %>
+                    </th>
+                    <td>
+                        <%= item.email %>
+                    </td>
+                    <td>
+                        <%= item.password %>
+                    </td>
+                    <td>
+                        <%= item.username %>
+                    </td>
+                    <td>
+                        <a href=""><i class="fa-solid fa-trash"></i></a> | <a href=""><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                    </td>
+                </tr>
+
+                <% }) %>
