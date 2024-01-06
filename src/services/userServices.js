@@ -76,10 +76,37 @@ const deleteUser = async (id) => {
     return rows;
 
 }
+const getOneUser = async (id) => {
+    const pool = await mysql2.createPool({
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "jwt_react",
+        promise: bluebird,
+    });
+    const [rows, fields] = await pool.execute('select * FROM user WHERE id=?', [id]);
+    // console.log(">>> check rows: ", rows);
+    return rows;
 
+}
+
+const UpdateUserInfor = async (email, username, id) => {
+    const pool = await mysql2.createPool({
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "jwt_react",
+        promise: bluebird,
+    });
+    const [rows, fields] = await pool.execute('Update  user SET email=?, username=? WHERE id=?', [email, username, id]);
+    // console.log(">>> check rows: ", rows);
+    return rows;
+}
 module.exports = {
     hashUserPassword,
     CreateNewUser,
     getallUser,
     deleteUser,
+    getOneUser,
+    UpdateUserInfor
 };

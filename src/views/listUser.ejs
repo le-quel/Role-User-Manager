@@ -36,7 +36,10 @@
                         <%= item.username %>
                     </td>
                     <td>
-                        <a href=""><i class="fa-solid fa-pen-to-square"></i></a> |
+                        |
+                        <a href="/update-user/<%= item.id%>">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
                         <form action="/delete-user/<%= item.id%>" method="post">
                             <button><i class="fa-solid fa-trash"></i></button>
                         </form>
