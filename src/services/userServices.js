@@ -2,13 +2,13 @@ var mysql2 = require('mysql2/promise');
 import bcrypt from "bcryptjs";
 
 import bluebird from "bluebird";
-var conection = mysql2.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "jwt_react",
-    promise: bluebird,
-});
+// var conection = mysql2.createConnection({
+//     host: "localhost",
+//     user: "root",
+//     password: "",
+//     database: "jwt_react",
+//     promise: bluebird,
+// });
 const salt = bcrypt.genSaltSync(10);
 
 
@@ -17,44 +17,41 @@ const hashUserPassword = (userPassword) => {
     return hashPassword;
 }
 
-const CreateNewUser = (email, password, username, res) => {
+const CreateNewUser = async (email, password, username, res) => {
+    const pool = await mysql2.createPool({
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "jwt_react",
+        promise: bluebird,
+    });
     let hashPass = hashUserPassword(password);
     console.log(">>> Check hashpassword:", hashPass);
 
     let check = bcrypt.compareSync(password, hashPass); // băm ngược
     console.log(">>> Check password:", check);
 
-    conection.connect(function (err) {
-        if (err) throw err;
-        console.log("Connected!");
-        var sql = "INSERT INTO user (email, password, username) VALUES (?, ?, ?)";
-        conection.query(sql, [email, hashPass, username], function (err, result) {
-            if (err) throw err;
-            console.log("1 record inserted");
-        });
-    });
-
-    // Do not use return res.send outside of a route handler
-    // You should handle the response within the route handler where CreateNewUser is called
+    const [rows, fields] = await pool.execute('INSERT INTO user (email, password, username) VALUES (?, ?, ?)', [email, hashPass, username]);
+    // console.log(">>> check rows: ", rows);
+    return rows;
 }
 
-const getallUser = async () => {
-    try {
-        var connection = await mysql2.createConnection({
-            host: "localhost",
-            user: "root",
-            password: "",
-            database: "jwt_react",
-            promise: bluebird,
-        });
 
+const getallUser = async () => {
+    const pool = await mysql2.createPool({
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "jwt_react",
+        promise: bluebird,
+    });
+
+    try {
         // Now, 'connection' is defined and can be used in your queries
-        const [rows, fields] = await connection.execute('SELECT * FROM user');
-        console.log(">>> check rows: ", rows);
+        const [rows, fields] = await pool.execute('SELECT * FROM user');
+        // console.log(">>> check rows: ", rows);
 
         // Close the connection after executing the query
-        await connection.end();
-
         return rows;
     } catch (error) {
         console.error(">>>check err:", error);
@@ -62,9 +59,27 @@ const getallUser = async () => {
     }
 };
 
+const deleteUser = async (id) => {
+    // DELETE FROM user WHERE id=?;
+    if (!id) {
+        throw new Error("Invalid id provided");
+    }
+    const pool = await mysql2.createPool({
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "jwt_react",
+        promise: bluebird,
+    });
+    const [rows, fields] = await pool.execute('DELETE FROM user WHERE id=?', [id]);
+    // console.log(">>> check rows: ", rows);
+    return rows;
+
+}
 
 module.exports = {
     hashUserPassword,
     CreateNewUser,
-    getallUser
+    getallUser,
+    deleteUser,
 };

@@ -11,6 +11,7 @@ const initWebRoutes = (app) => {
     router.get("/user", homeController.HandleUserPage)
     router.post("/user/create-user", homeController.HandleCreateNewUser)
     router.get("/getall-user", homeController.Handle_getallUser)
+    router.post("/delete-user/:id", homeController.HandleDeleteUser)
     return app.use("/", router);
 }
 export default initWebRoutes;

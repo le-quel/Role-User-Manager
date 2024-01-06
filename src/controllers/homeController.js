@@ -10,7 +10,7 @@ import bcrypts from "bcryptjs";
 const salt = bcrypts.genSaltSync(10);
 
 
-var conection = mysql2.createConnection({
+var pool = mysql2.createPool({
     host: "localhost",
     user: "root",
     password: "",
@@ -37,12 +37,13 @@ const HandleCreateNewUser = (req, res) => {
     // Pass the hashed password to userServices.CreateNewUser
     userServices.CreateNewUser(email, hashPassword, username);
 
-    return res.send("handlecreatenewuser");
+    return res.redirect("/user");
 }
 
 const Handle_getallUser = async (req, res) => {
     try {
         let userList = await userServices.getallUser();
+        // await userServices.deleteUser(16);
         // console.log(">>>check list user:", userList);
         return res.render("listUser.ejs", { userList });  // {userList} là trả nó ra theo dạng obj
     } catch (error) {
@@ -51,9 +52,19 @@ const Handle_getallUser = async (req, res) => {
     }
 }
 
+const HandleDeleteUser = async (req, res) => {
+    await userServices.deleteUser(req.params.id);
+    let userList = await userServices.getallUser();
+    return res.render("listUser.ejs", { userList });
+    // ...
+}
+
+
+
 module.exports = {
     HandleHelloWorld,
     HandleUserPage,
     HandleCreateNewUser,
-    Handle_getallUser
+    Handle_getallUser,
+    HandleDeleteUser
 }

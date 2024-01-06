@@ -302,3 +302,28 @@ var conection = await mysql.createConnection({
                 </tr>
 
                 <% }) %>
+
+
+                            BÀI 8: DELETE USER
+
+1. Viết hàm xóa ở file service  và exports
+
+const HandleDeleteUser = async (req, res) => {
+    await userServices.deleteUser(req.params.id);
+    let userList = await userServices.getallUser();
+    return res.render("listUser.ejs", { userList });
+    // ...
+}
+2. viết hàm handledelete ở file homecontroller
+const HandleDeleteUser = async (req, res) => {
+    await userServices.deleteUser(req.params.id);
+    let userList = await userServices.getallUser();
+    return res.render("listUser.ejs", { userList });
+    // ...
+}
+3. đường dẫn bằng id ở file listuser.ejs
+ <form action="/delete-user/<%= item.id%>" method="post">
+                            <button><i class="fa-solid fa-trash"></i></button>
+                        </form>
+4. đường dẫn ở file web.js router 
+   router.post("/delete-user/:id", homeController.HandleDeleteUser)
