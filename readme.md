@@ -327,3 +327,37 @@ const HandleDeleteUser = async (req, res) => {
                         </form>
 4. đường dẫn ở file web.js router 
    router.post("/delete-user/:id", homeController.HandleDeleteUser)
+
+
+
+
+                            BÀI 9 : CÀI ĐẶT ORM seQUELIze
+1. câu lệnh cài đặt sequelize "npm install --save-exact sequelize@6.13.0 sequelize-cli@6.3.0" sequelize-cli để chạy câu lệnh db của migration
+2. sửa thư mục configs thành config theo đề xuất của sequelize
+3. gõ câu lệnh "node_modules/.bin/sequelize init" để tạo thư mục được gõ trong sequelize
+3. tạo file connectDb trong config  lấy code từ web sequelize v6 connect to db 
+const { Sequelize } = require('sequelize')
+
+const sequelize = new Sequelize('jwt_react', 'root', null, {
+    host: 'localhost',
+    dialect: 'mysql'
+});
+const connecttion = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+}
+export default connecttion();
+4. import link file db vào file server
+
+                            BÀI 10: TẠO TABLE BẰNG CÂU LỆNH SEQUELIZE
+
+1. TRONG trang web https://sequelize.org/docs/v6/other-topics/migrations/ copy câu lẹnh để tạo db "npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string"
+-> orm là obj relational mapping là công cụ để chuyển db từ dạng cứng về thành model để dễ tương tác
+2. running migration để tạo db bằng câu lệnh " npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string"
+-> bảng sequelizemeta để lưu các thay đổi db và dùng thoải mái 
+3. kéo xuống dùng câu lệnh tạo file seeder " npx sequelize-cli seed:generate --name demo-user"
+-> running seeder "npx sequelize-cli db:seed:all"

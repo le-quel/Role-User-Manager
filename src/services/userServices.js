@@ -1,6 +1,7 @@
 var mysql2 = require('mysql2/promise');
 import bcrypt from "bcryptjs";
 
+const sequelize = require("sequelize");
 import bluebird from "bluebird";
 // var conection = mysql2.createConnection({
 //     host: "localhost",
@@ -31,7 +32,7 @@ const CreateNewUser = async (email, password, username, res) => {
     let check = bcrypt.compareSync(password, hashPass); // băm ngược
     console.log(">>> Check password:", check);
 
-    const [rows, fields] = await pool.execute('INSERT INTO user (email, password, username) VALUES (?, ?, ?)', [email, hashPass, username]);
+    const [rows, fields] = await pool.execute('INSERT INTO users (email, password, username) VALUES (?, ?, ?)', [email, hashPass, username]);
     // console.log(">>> check rows: ", rows);
     return rows;
 }
@@ -48,7 +49,7 @@ const getallUser = async () => {
 
     try {
         // Now, 'connection' is defined and can be used in your queries
-        const [rows, fields] = await pool.execute('SELECT * FROM user');
+        const [rows, fields] = await pool.execute('SELECT * FROM users');
         // console.log(">>> check rows: ", rows);
 
         // Close the connection after executing the query
@@ -71,7 +72,7 @@ const deleteUser = async (id) => {
         database: "jwt_react",
         promise: bluebird,
     });
-    const [rows, fields] = await pool.execute('DELETE FROM user WHERE id=?', [id]);
+    const [rows, fields] = await pool.execute('DELETE FROM users WHERE id=?', [id]);
     // console.log(">>> check rows: ", rows);
     return rows;
 
@@ -84,7 +85,7 @@ const getOneUser = async (id) => {
         database: "jwt_react",
         promise: bluebird,
     });
-    const [rows, fields] = await pool.execute('select * FROM user WHERE id=?', [id]);
+    const [rows, fields] = await pool.execute('select * FROM users WHERE id=?', [id]);
     // console.log(">>> check rows: ", rows);
     return rows;
 
@@ -98,7 +99,7 @@ const UpdateUserInfor = async (email, username, id) => {
         database: "jwt_react",
         promise: bluebird,
     });
-    const [rows, fields] = await pool.execute('Update  user SET email=?, username=? WHERE id=?', [email, username, id]);
+    const [rows, fields] = await pool.execute('Update  users SET email=?, username=? WHERE id=?', [email, username, id]);
     // console.log(">>> check rows: ", rows);
     return rows;
 }
