@@ -63,13 +63,15 @@ const HandleDeleteUser = async (req, res) => {
 const getUpdateUser = async (req, res) => {
     let id = req.params.id;
     let user = await userServices.getOneUser(id);
-    let userData = {};
-    if (user && user.length > 0) {
-        userData = user[0];
-        console.log(userData);
-    }
+    let userData = user;
+    // if (user && user.length > 0) {
+    //     userData = user[0];
+    //     console.log(userData);
+    // }
     // console.log(">>>Check user", user);
+    // console.log(">>>check userData", userData)
     return res.render("updateUser.ejs", { userData });
+
 }
 
 const HandleUpdateUser = async (req, res) => {

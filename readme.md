@@ -356,8 +356,228 @@ export default connecttion();
                             BÀI 10: TẠO TABLE BẰNG CÂU LỆNH SEQUELIZE
 
 1. TRONG trang web https://sequelize.org/docs/v6/other-topics/migrations/ copy câu lẹnh để tạo db "npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string"
+ npx sequelize-cli model:generate --name User --attributes email:string,password:string,username:string,address:string,sex:string,phone:stri
+ng,groupId:integer
+-> tạo các bảng khác cũng dùng câu lệnh này và chỉ cần sửa tên bảng với trường kiểu dữ liệu là được sau đó chạy câu lệnh khởi tạo "
+ npx sequelize-cli db:migrate "
+  createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP")
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+      }
 -> orm là obj relational mapping là công cụ để chuyển db từ dạng cứng về thành model để dễ tương tác
-2. running migration để tạo db bằng câu lệnh " npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string"
+2. running migration để tạo db bằng câu lệnh " npx sequelize-cli db:migrate"
 -> bảng sequelizemeta để lưu các thay đổi db và dùng thoải mái 
 3. kéo xuống dùng câu lệnh tạo file seeder " npx sequelize-cli seed:generate --name demo-user"
 -> running seeder "npx sequelize-cli db:seed:all"
+4. bỏ câu lệnh này vào file config.json deverlopment để bỏ chữ s phía sau bảng 
+thay đổi tên db ở mục database deverlopment
+ "define": {
+      "freezeTableName": "true"
+    }
+5. DỮ LIỆU MẪU DB CODE FILE SEEDER
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    /**
+     * Add seed commands here.
+     *
+     * Example:
+     * await queryInterface.bulkInsert('People', [{
+     *   name: 'John Doe',
+     *   isBetaMember: false
+     * }], {});
+    */
+    await queryInterface.bulkInsert('user', [
+      {
+        email: 'John Doe',
+        password: '123',
+        username: 'quel1'
+
+      }, {
+        email: 'John Doe',
+        password: '123',
+        username: 'quel2'
+
+      }, {
+        email: 'John Doe',
+        password: '123',
+        username: 'quel3'
+
+      },
+    ], {});
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    /**
+     * Add commands to revert seed here.
+     *
+     * Example:
+     * await queryInterface.bulkDelete('People', null, {});
+     */
+  }
+};
+
+                            BÀI 11: CRUD BẰNG ORM KO DÙNG CÂU QUERY
+1. createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
+      }
+2. ở file services hàm tạo user dùng hàm ấy thày cho hàm db và bỏ luôn câu lệnh query
+  await db.User.create({
+        email: email,
+        password: hashPass,
+        username: username,
+
+
+    })
+
+3. ở file services hàm hiển thị cũng tương tự thay bằng hàm tạo 
+ let users = []
+    users = await db.User.findAll()
+    return users; chỉ vậy là đủ để hiển thị
+4. delete user 
+    await db.User.destroy({
+        where: {
+            id: id
+        }
+    });
+5. getoneuser
+
+                                                    BÀI 12: SET MỐI QUAN HỆ BẰNG CÂU LỆNH 
+                            
+1. ĐỌC document tại sequelize assosciations, eager loading giống join quan hệ database
+file group 
+static associate(models) {
+      // define association here
+      Group.hasMany(models.User);      n-1 vs user
+      Group.belongsToMany(models.Role, {through:'Group_Role'});   1-n vs role 
+    } 
+file user
+ static associate(models) {
+      // define association here
+      User.belongsTo(models.Group);
+      User.belongsToMany(models.Project, { through: 'User_Project' });
+    }
+file project
+   static associate(models) {
+      // define association here
+      Project.belongsToMany(models.User, { through: 'User_Project' });
+    }
+
+    file migration user
+    'use strict';
+
+const { literal } = require("sequelize");
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('User', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      email: {
+        type: Sequelize.STRING
+      },
+      password: {
+        type: Sequelize.STRING
+      },
+      username: {
+        type: Sequelize.STRING
+      },
+      address: {
+        type: Sequelize.STRING
+      },
+      sex: {
+        type: Sequelize.STRING
+      },
+      phone: {
+        type: Sequelize.STRING
+      },
+      groupId: {
+        type: Sequelize.INTEGER
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP")
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+      }
+    });
+  },
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('User');
+  }
+};
+
+file user model
+
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+      User.belongsTo(models.Group);
+      User.belongsToMany(models.Project, { through: 'User_Project' });
+    }
+  };
+  User.init({
+    email: DataTypes.STRING,
+    password: DataTypes.STRING,
+    username: DataTypes.STRING,
+    address: DataTypes.STRING,
+    sex: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    groupId: DataTypes.INTEGER
+  }, {
+    sequelize,
+    modelName: 'User',
+  });
+  return User;
+};
+
+                          BÀI 13. VIẾT API 
+1. ở folder routers tạo file api.js
+file web.js tạo đường dẫn và import controller 
+  import apicontroller from "../controllers/apicontroller";
+   router.get("/api/test-api", apicontroller.testAPI)
+folder controller tạo file apicontroller.js trong đó viết api
+
+    const testAPI = (req, res) => {
+        return res.status(200).json({
+            message: 'ok',
+            data: 'testAPI'
+        })
+    }
+
+    module.exports = {
+        testAPI
+    }
+2. gõ đường dẫn để xem api thông qua router " http://localhost:8080/api/test-api "
