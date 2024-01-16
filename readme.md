@@ -581,3 +581,57 @@ folder controller tạo file apicontroller.js trong đó viết api
         testAPI
     }
 2. gõ đường dẫn để xem api thông qua router " http://localhost:8080/api/test-api "
+
+                                BÀI 14: FIX LỖI CROS 
+                      
+1. định nghĩa: đây là một lỗi dó trình duyệt phát triển nhằm để chặn những website khác dùng coockie của bạn truy cập lung tung nên nó chặn giữa các font-end còn phía backend thì không có định nghĩa này nên lấy api từ nhau thoải mái
+-> và chỉ có backend cho phép những url font-end nào được truy cập mới đc 
+bỏ đoạn này vào file server.js
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', process.env.REACT_URL);
+    res.setHeader('Access-Control-Allow-Methods', 'GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Request-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
+file env. thêm đoạn 
+REACT_URL= http://localhost:8080 để cho phép fontend nào đc truy cập
+
+vãi ò mình vừa fix một số lỗi ở console thì phát hiện ra lỗi cú pháp ở các file khác cũng sẽ tác động đến api khiến cho quá trình trả dữ liệu bị lỗi vì vậy khi mà code phải tuân thủ cực kỳ nghiêm ngặt cú pháp của version
+
+
+2. đổi verson lên node 20 để cài cors " npm install cors"
+xong import vô file server
+import cors from "cors";
+app.use(cors());
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', process.env.REACT_URL);
+    res.setHeader('Access-Control-Allow-Methods', 'GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Request-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
+3. phía fontend không dùng axios để đọc api nữa mà dùng fetch data 
+ useEffect(() => {
+        // axios.get("http://localhost:8080/api/test-api").then(response => {
+        //     console.log(">>>check api dataa", response.data);
+        // }).catch(error => {
+        //     console.error(">>>check api error", error);
+        // });
+
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/api/test-api');
+                const result = await response.json();
+                // setData(result);
+                console.log(result);
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        fetchData();
+    }, []);
+4. end api
