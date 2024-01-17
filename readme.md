@@ -826,4 +826,13 @@ module.exports = {
     testAPI,
     hanleRegister
 }
+2. bổ sung điều kiện số lượng  ký tự mật khẩu 
+ if (req.body.password && req.body.password.length < 4) {
+                return res.status(200).json({
+                    EM: 'Your password mush more than 3 letters',
+                    EC: '',
+                    DT: '1',
+                    data: 'err length password'
+                })
+            }
 3. check ở tab network -> fetch\xhr -> ấn submit -> ấn vào register để xem message trả ra nếu đúng thì ok sai thì fix lỗi 

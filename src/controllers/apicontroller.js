@@ -15,8 +15,16 @@ const hanleRegister = async (req, res) => {
                 EM: 'Missing required parameters',
                 EC: '',
                 DT: '1',
-                data: 'err api'
+                data: 'err '
             })
+            if (req.body.password && req.body.password.length < 4) {
+                return res.status(200).json({
+                    EM: 'Your password mush more than 3 letters',
+                    EC: '',
+                    DT: '1',
+                    data: 'err length password'
+                })
+            }
         }
 
         let data = await loginRegisterServices.registerNewUser(req.body)
