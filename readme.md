@@ -703,3 +703,127 @@ const hanleRegister = (req, res) => {
 
 
                                         BÀI 17: TẠO API THÊM MỚI USER
+
+1. thư mục services tạo file loginRegisterServices.js và viết 4 hàm  import byscyip để băm password
+import db from "../models/index";
+import bcrypt from "bcryptjs";
+const saltRounds = 10;
+
+const hashUserPassword = (userPassword) => {
+    let hashPassword = bcrypt.hashSync(userPassword, saltRounds);
+    return hashPassword;
+}
+const checkEmailExist = async (userEmail) => {
+    let isExist = await db.Users.findOne({
+        where: { email: userEmail }
+    })
+    if (isExist) {
+        return true;
+    }
+    return false;
+}
+
+
+const checkPhoneExist = async (userPhone) => {
+    let isExist = await db.Users.findOne({
+        where: { phone: userPhone }
+    })
+    if (isExist) {
+        return true;
+    }
+    return false;
+}
+
+const registerNewUser = async (rawUserData) => {
+    // check email user exist
+    try {
+        let isEmailExist = await checkEmailExist(rawUserData.email)
+        if (isEmailExist === true) {
+            return {
+                EM: "The email is already exist",
+                EC: 1
+            }
+
+        }
+        let isPhoneExist = await checkPhoneExist(rawUserData.phone)
+        if (isPhoneExist === true) {
+            return {
+                EM: "The phone is already exist",
+                EC: 1
+            }
+
+        }
+        // hasspassword
+        let hasspassword = hashUserPassword(rawUserData.password)
+        await db.Users.create({
+            email: rawUserData.email,
+            phone: rawUserData.phone,
+            username: rawUserData.username,
+            password: rawUserData.password
+        })
+        return {
+            EM: "A user created is succesfully!",
+            EC: 0
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EM: "Something wrong is services in...",
+            EC: 2
+        }
+
+    }
+
+}
+module.exports = {
+    registerNewUser,
+    checkEmailExist,
+    checkPhoneExist,
+    hashUserPassword
+}
+2. file api controler viết
+import loginRegisterServices from "../services/loginRegisterServices";
+const testAPI = (req, res) => {
+    return res.status(200).json({
+        message: 'ok',
+        data: 'testAPI'
+    })
+}
+
+const hanleRegister = async (req, res) => {
+    try {
+        // req.body email, phone, username, password
+        console.log(">>> call me", req.body);
+        if (!req.body.email || !req.body.phone || !req.body.password) {
+            return res.status(200).json({
+                EM: 'Missing required parameters',
+                EC: '',
+                DT: '1',
+                data: 'err api'
+            })
+        }
+
+        let data = await loginRegisterServices.registerNewUser(req.body)
+        // services create user
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,     // err code 
+            DT: '',        // date
+            data: 'success!'
+        })
+    } catch (error) {
+        return res.status(500).json({
+            EM: 'err form server',  // err message
+            EC: '',     // err code 
+            DT: '',        // date
+            data: 'err api'
+        })
+    }
+
+}
+module.exports = {
+    testAPI,
+    hanleRegister
+}
+3. check ở tab network -> fetch\xhr -> ấn submit -> ấn vào register để xem message trả ra nếu đúng thì ok sai thì fix lỗi 
