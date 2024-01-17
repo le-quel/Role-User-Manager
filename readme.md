@@ -635,3 +635,71 @@ app.use(function (req, res, next) {
         fetchData();
     }, []);
 4. end api
+
+                                        BÀI 15: TÁCH API QUA FILE CORS
+            
+1. trong thư mục config tạo file cors.js
+xong bê đống code cors bên server vào 
+2. require env để nhận localhost:300 bên fontend 
+require("dotenv").config();
+const configCors = (app) => {
+    app.use(function (req, res, next) {
+        res.setHeader('Access-Control-Allow-Origin', process.env.REACT_URL);
+        res.setHeader('Access-Control-Allow-Methods', 'GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'X-Request-With,content-type');
+        res.setHeader('Access-Control-Allow-Credentials', true);
+        next();
+    });
+}
+
+export default configCors;
+3. file api.js copy cả file web bỏ vào và sửa thành initApiRoutes
+import express from "express";
+
+import apicontroller from "../controllers/apicontroller";
+/**
+ * @param {*} app: express app
+ */
+const router = express.Router();
+
+const initApiRoutes = (app) => {
+
+    // 4 method GET-R post-C put-U delete-D
+    router.get("/test-api", apicontroller.testAPI)
+    return app.use("/api/v14", router);
+}
+export default initApiRoutes;
+4. file server.js khai báo 2 thứ
+// config cors
+configCors(app);
+// test connectdb
+
+//init web routes
+initWebRoutes(app);
+
+                      BÀI 16: API NHẬN DATA 
+    
+1. Tạo router   router.post("/register", apicontroller.hanleRegister)
+2. tạo function hanlde  và export 
+const hanleRegister = (req, res) => {
+
+    console.log(">>> call me", req.body);
+}
+3. phía font-end  search axios npm github post user để copy 
+ bỏ đoạn này vào hàm hanldregister để lấy data truyền qua api về backend
+ if (check == true) {
+            axios.post('http://localhost:8080/api/v14/register', {
+                email, phone, username, password
+            })
+        }
+4. mỗi lần ấn reload sẽ nhận từ data từ fontend
+ log ra đc 
+ >>> call me {
+  email: 'anhqueltandiencm@gmail.com',
+  phone: '0832575905',
+  username: '1231234',
+  password: '123'
+}
+
+
+                                        BÀI 17: TẠO API THÊM MỚI USER

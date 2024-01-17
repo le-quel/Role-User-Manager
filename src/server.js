@@ -4,6 +4,8 @@ import initWebRoutes from "./routers/web";
 import bodyParser from "body-parser";
 import cors from 'cors';
 import connecttion from "./config/connectDB";
+import initApiRoutes from "./routers/api";
+import configCors from "./config/cors";
 require("dotenv").config();
 const app = express();
 //config bodyparser
@@ -21,10 +23,15 @@ app.use(function (req, res, next) {
 //config view engine
 configViewEngine(app);
 
+// config cors
+configCors(app);
 // test connectdb
 
 //init web routes
 initWebRoutes(app);
+// init Api Routes;
+initApiRoutes(app);
+
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
