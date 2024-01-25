@@ -836,3 +836,77 @@ module.exports = {
                 })
             }
 3. check ở tab network -> fetch\xhr -> ấn submit -> ấn vào register để xem message trả ra nếu đúng thì ok sai thì fix lỗi 
+
+
+
+                    BÀI 18: HÀM LOGIN CHECK TÌM USER VÀ CHECK SO PASSWORD
+                
+1. HÀM Ở FILE loginRegister 
+const handleUserLogin = async (rawData) => {
+
+    try {
+        let user = await db.Users.findOne({
+            where: {
+                [Op.or]: [
+                    { email: rawData.valueLogin },
+                    { phone: rawData.valueLogin }
+                ]
+            }
+        });
+        // console.log(">>>>check user obj: ", user.get({ plain: true }));
+        // console.log(">>>>check user obj: ", user);
+        // console.log(">>>check raw login: ", rawdata);
+        // log ra câu sql vs obj user khi query bằng username hoặc phone đã trả ra thành công nên cmt để mốt xài 
+        if (user) {
+            console.log("tìm thấy user và bước tiếp theo là check password");
+            let isCorrectPassword = checkPassword(rawData.password, user.password);
+            console.log("Password comparison result:", isCorrectPassword);
+            if (isCorrectPassword) {
+                return {
+                    EM: "Login successful",
+                    EC: 0,
+                    DT: "ok"
+                };
+            } else {
+                console.log(">>>>password sai nên chạy vào đây", rawData.valueLogin);
+                return {
+                    EM: "Your email or phone number or password is incorrect",
+                    EC: 1
+                };
+            }
+        } else {
+            console.log(">>>>Not found user with email/phone", rawData.valueLogin);
+            return {
+                EM: "Your email or phone number or password is incorrect",
+                EC: 1
+            };
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EM: "Something wrong in services...",
+            EC: 2
+        };
+    }
+};
+2. làm tới đâu log ra tới đó để xem nó chạy vào đâu mà fix lỗi
+3. hàm ở apicontroller
+const handleLogin = async (req, res) => {
+    try {
+        loginRegisterServices.handleUserLogin(req.body)
+        return res.status(200).json({
+            EM: 'Login successful',
+            EC: '0',
+            DT: '',
+            data: 'Login success!'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EM: 'err form server',  // err message
+            EC: '',     // err code 
+            DT: '',        // date
+            data: 'err api'
+        })
+    }
+
+}

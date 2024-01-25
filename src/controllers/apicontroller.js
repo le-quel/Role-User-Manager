@@ -45,7 +45,42 @@ const hanleRegister = async (req, res) => {
     }
 
 }
+
+const handleLogin = async (req, res) => {
+    try {
+        const result = await loginRegisterServices.handleUserLogin(req.body);
+
+        if (result.EC === 0) {
+            return res.status(200).json({
+                EM: 'Login successful',
+                EC: '0',
+                DT: '',
+                data: 'Login success!'
+            });
+        } else {
+            return res.status(401).json({
+                EM: 'Login failed',
+                EC: result.EC,
+                DT: result.DT,
+                data: 'Invalid email/phone or password'
+            });
+        }
+    } catch (error) {
+        console.error(error);
+
+        // Handle unexpected errors
+        return res.status(500).json({
+            EM: 'Internal Server Error',
+            EC: '2',
+            DT: '',
+            data: 'Error occurred on the server'
+        });
+    }
+}
+
+
 module.exports = {
     testAPI,
-    hanleRegister
+    hanleRegister,
+    handleLogin
 }

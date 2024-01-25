@@ -1,6 +1,8 @@
 import express from "express";
 
 import apicontroller from "../controllers/apicontroller";
+
+import UserController from "../controllers/UserController";
 /**
  * @param {*} app: express app
  */
@@ -11,6 +13,11 @@ const initApiRoutes = (app) => {
     // 4 method GET-R post-C put-U delete-D
     router.get("/test-api", apicontroller.testAPI)
     router.post("/register", apicontroller.hanleRegister)
-    return app.use("/api/v14", router);
+    router.post("/login", apicontroller.handleLogin)
+    router.get("/users/read/", UserController.readFunc);
+    router.post("/users/create", UserController.createFunc);
+    router.put("/users/update", UserController.updateFunc)
+    router.delete("/users/delete", UserController.deleteFunc)
+    return app.use("/api", router);
 }
 export default initApiRoutes;
