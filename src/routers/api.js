@@ -3,6 +3,7 @@ import express from "express";
 import apicontroller from "../controllers/apicontroller";
 
 import UserController from "../controllers/UserController";
+import GroupController from "../controllers/GroupController";
 /**
  * @param {*} app: express app
  */
@@ -14,10 +15,13 @@ const initApiRoutes = (app) => {
     router.get("/test-api", apicontroller.testAPI)
     router.post("/register", apicontroller.hanleRegister)
     router.post("/login", apicontroller.handleLogin)
+
     router.get("/users/read/", UserController.readFunc);
     router.post("/users/create", UserController.createFunc);
     router.put("/users/update", UserController.updateFunc)
     router.delete("/users/delete", UserController.deleteFunc)
+
+    router.get("/group/read/", GroupController.readFunc);
     return app.use("/api", router);
 }
 export default initApiRoutes;

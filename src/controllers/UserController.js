@@ -35,16 +35,63 @@ const readFunc = async (req, res) => {
 
 
 
-const createFunc = (req, res) => {
-
+const createFunc = async (req, res) => {
+    try {
+        let data = await userApiServices.createNewUser(req.body); // Corrected line
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT,
+            data: 'success!'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EM: 'err from server',
+            EC: '',
+            DT: 'err create function usercontroller',
+            data: 'err create function'
+        });
+    }
 }
-const updateFunc = (req, res) => {
 
+const updateFunc = async (req, res) => {
+    try {
+        let data = await userApiServices.updateUser(req.body);
+        console.log(">>check id", req.body);
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT,
+            data: 'success!'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EM: 'err from server',
+            EC: '',
+            DT: '',
+            data: 'err updatefunc'
+        });
+    }
 }
-const deleteFunc = (req, res) => {
-
-}
-
+const deleteFunc = async (req, res) => {
+    try {
+        let data = await userApiServices.deleteUser(req.body.id);
+        console.log(">>check id", req.body);
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT,
+            data: 'success!'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            EM: 'err from server',
+            EC: '',
+            DT: '',
+            data: 'err api delete'
+        });
+    }
+};
 module.exports = {
     readFunc,
     createFunc,

@@ -25,6 +25,7 @@ const HandleHelloWorld = (req, res) => {
 
 const HandleUserPage = (req, res) => {
     return res.render("user.ejs");
+
 }
 
 
@@ -45,12 +46,19 @@ const Handle_getallUser = async (req, res) => {
         let userList = await userServices.getallUser();
         // await userServices.deleteUser(16);
         // console.log(">>>check list user:", userList);
-        return res.render("listUser.ejs", { userList });  // {userList} là trả nó ra theo dạng obj
+        return res.render("listUser.ejs", { userList });  // day là trả ra cho view {userList} là trả nó ra theo dạng obj
+        // đây là kiểu trả ra cho api
+        // return res.status(200).json({
+        //     userList: userList,
+        //     data: 'success!'
+        // });
+
     } catch (error) {
         console.error("Error in Handle_getallUser:", error);
         return res.status(500).send("Internal Server Error");
     }
 }
+
 
 const HandleDeleteUser = async (req, res) => {
     await userServices.deleteUser(req.params.id);

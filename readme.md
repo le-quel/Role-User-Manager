@@ -910,3 +910,8 @@ const handleLogin = async (req, res) => {
     }
 
 }
+
+                                            BÀI 19 TẠO API GỌI ALL GROUP 
+
+1. ghi nho bảng trong db có s kệ nó ghi tên bảng theo model nha
+2. tạo api gọi group ở route controller va services
